@@ -3,12 +3,12 @@
     <v-data-table
       v-model="selected"
       :headers="headers"
-      :items="Pedidos"
+      :items="allPedidos"
       @click:row="DetallesPedido"
-      :single-select="singleSelect"
-      item-key="name"
-      show-select
-      sort-by="name"
+      item-key="ID_PEDIDO"
+      :show-select="showselect"
+      :item-class="itemRowBackground"
+      sort-by="ID_PEDIDO"
       class="elevation-1"
       loading-text="Loading... Please wait"
     >
@@ -17,29 +17,33 @@
           <v-toolbar-title>PEDIDOS</v-toolbar-title>
           <v-divider class="mx-4" inset vertical></v-divider>
           <v-spacer></v-spacer>
-          <v-dialog v-model="dialog" max-width="90%">
-            <Pedidos :name="SelectedItem.name" @toggle="dialog = $event" />
-          </v-dialog>
+          <div class="text-center">
+            <v-dialog
+              v-model="dialog"
+              max-width="60%"
+              transition="dialog-bottom-transition"
+              persistent
+            >
+              <template v-if="dialog">
+                <Pedidos
+                  :name="SelectedItem.ID_PEDIDO"
+                  :items="Detalles.Productos"
+                  :cliente="Cliente"
+                  @toggle="dialog = $event"
+                  v-on:res="RespuestaPedido"
+                  :edit="showedit"
+                />
+              </template>
+            </v-dialog>
+          </div>
         </v-toolbar>
       </template>
-
-      <template v-slot:[`item.actions`]="{ item }">
-      <v-icon
-        :color="item.actions.color">
-          {{item.actions.src}}
-      </v-icon>
-    </template>
-    <template v-slot:no-data>
-      <v-btn
-        color="primary"
-        @click="initialize"
-      >
-        Reset
-      </v-btn>
-    </template>
+      <template v-slot:no-data>
+        <v-btn color="primary" @click="initialize"> Reset </v-btn>
+      </template>
     </v-data-table>
     <div class="text-center pt-2">
-      <v-btn color="primary" @click="PedidosConfirmados">
+      <v-btn color="primary" v-show="showselect" @click="ConfirmaPedidos">
         Confirmar Pedidos
       </v-btn>
     </div>
@@ -47,29 +51,56 @@
 </template>
 <script>
 import Pedidos from "../components/info-pedidos.vue";
-
+import { mapGetters, mapActions } from "vuex";
 export default {
   components: {
     Pedidos,
   },
   data: () => ({
     singleSelect: false,
+    showselect: true,
+    showedit: true,
     selected: [],
+    Detalles: {
+      ID_PEDIDO: 0,
+      ID_CLIENTE: 0,
+      Productos: [
+        {
+          ID_PEDIDO: 0,
+          ID_ESTADO: 0,
+          ID_PRODUCTO: 0,
+          CANTIDAD: 0,
+          TIPO_MEDIDA: "",
+        },
+      ],
+    },
+    Cliente: [
+      {
+        ID_CLIENTE: 0,
+        ID_USUARIO: 0,
+        NOMBRE_EMPRESA: "",
+        RFC: "",
+        EMAIL: "",
+        TELEFONO: "",
+        DOMICILIO: "",
+        CIUDAD: "",
+      },
+    ],
     dialog: false,
+    modificados: [],
     headers: [
       {
-        text: "Cliente",
+        text: "ID PEDIDO",
         align: "start",
         sortable: false,
-        value: "name",
+        value: "ID_PEDIDO",
       },
-      { text: "Fecha", value: "date" },
-      { text: "Columna 2", value: "fat" },
-      { text: "Columna 3", value: "carbs" },
-      { text: "Columna 4", value: "protein" },
-      { text: "Acciones", value: "actions", sortable: false },
+      { text: "FECHA PEDIDO", value: "FECHA_PEDIDO" },
+      { text: "FECHA ENTREGA", value: "FECHA_ENTREGA" },
     ],
     Pedidos: [],
+    lastIndex: -1,
+    PedidosConfirmados: [{}],
     SelectedIndex: 0,
     SelectedItem: {
       name: "",
@@ -81,88 +112,125 @@ export default {
   }),
 
   computed: {
+    ...mapGetters(["allPedidos", "getLoading"]),
   },
 
   watch: {},
 
   created() {
-    this.initialize();
+    this.$watch(
+      () => this.$route.params,
+      () => {
+        this.initialize();
+        if (this.$route.params.id == 1) {
+          this.showselect = true;
+          this.showedit = true;
+        } else {
+          console.log(this.$route.params.id);
+          this.showselect = false;
+          this.showedit = false;
+        }
+      }
+    );
   },
 
   methods: {
+    ...mapActions([
+      "setPedidos",
+      "setDetallePedido",
+      "setCliente",
+      "setproductoCat",
+      "productInfo",
+      "confirmaPedido",
+    ]),
     initialize() {
-      this.Pedidos = [
-        {
-          id: 1,
-          check: false,
-          name: "Cliente 1",
-          date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-            .toISOString()
-            .substr(0, 10),
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-          actions: {src: 'mdi-checkbox-marked-circle', color:'green'}
-        },
-        {
-          id: 2,
-          check: false,
-          name: "Cliente 2",
-          date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-            .toISOString()
-            .substr(0, 10),
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-          actions: {src: 'mdi-cancel', color: 'red'}
-        },
-        {
-          id: 3,
-          check: false,
-          name: "Cliente 3",
-          date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-            .toISOString()
-            .substr(0, 10),
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-          actions: {src: 'mdi-cancel', color: 'red'}
-        },
-        {
-          id: 4,
-          check: false,
-          name: "Cliente 4",
-          date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-            .toISOString()
-            .substr(0, 10),
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-           actions: {src: 'mdi-checkbox-marked-circle', color:'green'}
-        },
-        {
-          id: 5,
-          check: false,
-          name: "Cliente 5",
-          date: new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
-            .toISOString()
-            .substr(0, 10),
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-          actions: {src: 'mdi-cancel', color: 'red'}
-        },
-      ];
+      this.setPedidos({ id: this.$route.params.id });
     },
-    DetallesPedido(item) {
-      this.SelectedIndex = this.Pedidos.indexOf(item);
+      itemRowBackground: function (item) {
+     return item.STATUS > 1 ? 'style-1' : 'style-2'
+  },
+    DetallesPedido(item, row) {
+      row.select(true);
+      this.SelectedIndex = this.allPedidos.indexOf(item);
       this.SelectedItem = Object.assign({}, item);
-      this.dialog = true;
+      var bool;
+      this.modificados.forEach((element) => {
+        if (element.id == this.SelectedIndex) {
+          bool = true;
+          return;
+        }
+      });
+      if (bool) {
+        this.dialog = true;
+        return;
+      }
+      this.setDetallePedido({
+        id: this.SelectedItem.ID_PEDIDO,
+        onComplete: (response) => {
+          this.Detalles.ID_PEDIDO = this.SelectedItem.ID_PEDIDO;
+          this.Detalles.ID_CLIENTE = response.data[0].ID_CLIENTE;
+          this.Detalles.Productos = new Array();
+          response.data.forEach((el) => {
+            this.productInfo({
+              id: el.ID_PRODUCTO,
+              onComplete: (response) => {
+                var aux = {
+                  ID_SOLICITUD: el.ID_SOLICITUD,
+                  ID_PRODUCTO: parseInt(el.ID_PRODUCTO),
+                  NOMBRE: response.data[0].NOMBRE,
+                  CANTIDAD: parseInt(el.CANTIDAD),
+                  TIPO_MEDIDA: el.TIPO_MEDIDA,
+                  EXISTENCIA: parseInt(response.data[0].EXISTENCIA),
+                  ID_ESTADO: parseInt(el.ID_ESTADO),
+                  ID_CATEGORIA: parseInt(response.data[0].ID_CATEGORIA),
+                };
+                this.Detalles.Productos.push(aux);
+              },
+            });
+          });
+          this.setCliente({
+            id: 1,
+            onComplete: (response) => {
+              this.Cliente = response.data;
+            },
+          }).then((this.dialog = true));
+        },
+        onError: (error) => {
+          console.log(error);
+        },
+      });
     },
-    PedidosConfirmados() {
-      console.log(this.selected);
+    RespuestaPedido(items) {
+      if (this.SelectedIndex > -1) {
+        this.modificados.push({ id: this.SelectedIndex, bool: true });
+        this.PedidosConfirmados.splice(
+          this.SelectedIndex,
+          1,
+          Object.assign(items)
+        );
+      }
     },
-
+    ConfirmaPedidos() {
+      if (this.selected.length != 0) {
+        for (let i = 0; i < this.selected.length; i++) {
+          if (
+            this.selected[i].ID_PEDIDO == this.PedidosConfirmados[i].ID_PEDIDO
+          ) {
+            this.PedidosConfirmados[i].Productos.forEach((element) => {
+              this.confirmaPedido({
+                id: element.ID_PRODUCTO,
+                params: {
+                  CANTIDAD: parseInt(element.CANTIDAD),
+                  ESTADO: 2,
+                  ID_SOLICITUD: element.ID_SOLICITUD,
+                },
+              });
+            });
+          }
+        }
+      }
+      this.initialize();
+    },
   },
 };
 </script>
