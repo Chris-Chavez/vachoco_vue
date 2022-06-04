@@ -1,6 +1,17 @@
 const express = require('express');
 const rutas = express.Router();
 const BD = require('../config/BD.js');
+const path = require("path");
+const { execFile, exec, spawn } = require("child_process");
+
+rutas.post('/python', function (req, res) {
+    const subprocess = spawn("python", [
+        path.join('../Ejecutables/Pedidos.py'),
+    ]);
+    subprocess.on("close", (code) => {
+        res.json(1)
+    })
+});
 
 rutas.get('/Productos', (req, res) => {
     if (BD) {
@@ -16,18 +27,18 @@ rutas.get('/Productos', (req, res) => {
 }
 );
 
-rutas.get('/Categorias',(req, res)=>{
-if (BD) {
-    let sql = 'CALL sp_getCategories();';
-    BD.query(sql, (err, rows) => {
-        if (err) {
-            res.json(err);
-        } else {
-            res.json(rows)
-        }
-    })
+rutas.get('/Categorias', (req, res) => {
+    if (BD) {
+        let sql = 'CALL sp_getCategories();';
+        BD.query(sql, (err, rows) => {
+            if (err) {
+                res.json(err);
+            } else {
+                res.json(rows)
+            }
+        })
 
-}
+    }
 });
 
 rutas.post('/products-cat/:ID', (req, res) => {
@@ -108,7 +119,7 @@ rutas.post('/Login', (req, res) => {
             return res.status(400).send({ error: true, mensaje: "La PASSWORD es obligatoria" })
         }
         let sql = 'CALL sp_login(?,?)';
-        BD.query(sql, [usuario.user,usuario.pass],(err, rows) => {
+        BD.query(sql, [usuario.user, usuario.pass], (err, rows) => {
             if (err) {
                 res.json(err);
             } else {
@@ -128,7 +139,7 @@ rutas.post('/Login2', (req, res) => {
             return res.status(400).send({ error: true, mensaje: "La PASSWORD es obligatoria" })
         }
         let sql = 'SELECT LoginEmpleados(?,?) as respuesta';
-        BD.query(sql, [usuario.user,usuario.pass],(err, rows) => {
+        BD.query(sql, [usuario.user, usuario.pass], (err, rows) => {
             if (err) {
                 res.json(err);
             } else {
@@ -144,7 +155,7 @@ rutas.put('/Act-Estado-Prod/:ID', (req, res) => {
         const CANTIDAD = req.body.CANTIDAD;
         const ESTADO = req.body.ESTADO;
         const ID_SOLICITUD = req.body.ID_SOLICITUD;
-        
+
         let sql = `update detalle_solicitudes set CANTIDAD = ${CANTIDAD}, ESTADO = ${ESTADO} WHERE ID_SOLICITUD = ${ID_SOLICITUD} AND ID_PRODUCTO = ${id};`;
         console.log(sql)
         BD.query(sql, (err, rows) => {
@@ -200,7 +211,7 @@ rutas.post('/Cliente/:id', (req, res) => {
     if (BD) {
         const ID = req.params.id;
         let sql = 'SELECT ID_CLIENTE,ID_USUARIO,NOMBRE_EMPRESA,RFC,EMAIL,TELEFONO,DOMICILIO,CIUDAD FROM clientes WHERE ID_USUARIO = ?;';
-        BD.query(sql, [ID],(err, rows) => {
+        BD.query(sql, [ID], (err, rows) => {
             if (err) {
                 res.send(err)
             } else {
