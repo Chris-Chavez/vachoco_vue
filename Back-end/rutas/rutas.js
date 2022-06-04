@@ -9,7 +9,7 @@ rutas.post('/python', function (req, res) {
         path.join('./python/Pedidos.py'),
     ]);
     subprocess.on("close", (code) => {
-        res.json(1)
+        res.json(code)
     })
 });
 
