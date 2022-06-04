@@ -1,11 +1,11 @@
 const mysql = require('mysql');
 
 const objectConnection = {
-    "host": "localhost",
-    "port": 3306,
-    "user": "root",
-    "password": "admin123",
-    "database": "VACHOCO"
+    "host": "db-vachoco-do-user-11722385-0.b.db.ondigitalocean.com",
+    "port": 25060,
+    "user": "doadmin",
+    "password": "AVNS_J8CRZLkfMw3lIYv",
+    "database": "defaultdb"
 }
 
 const myConn = mysql.createConnection(objectConnection);
