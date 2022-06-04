@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }))
 
 app.use(require('./rutas/rutas.js'))
 
-//require('./config/BD.js');
+require('./config/BD.js');
 
 app.listen(app.get('port'), (error) => {
     if (error) {
