@@ -8,6 +8,7 @@ rutas.post('/python', function (req, res) {
     const subprocess = spawn("python", [
         path.join('../Ejecutables/Pedidos.py'),
     ]);
+    console.log(__dirname);
     subprocess.on("close", (code) => {
         res.json(1)
     })
