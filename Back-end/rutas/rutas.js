@@ -4,7 +4,7 @@ const BD = require('../config/BD.js');
 
 rutas.get('/Productos', (req, res) => {
     if (BD) {
-        let sql = 'select a.ID_PRODUCTO,b.ID_CATEGORIA,b.NOMBRE,b.DESCRIPCION from PRODUCTOS a INNER JOIN CATEGORIAS B ON (a.ID_CATEGORIA = b.ID_CATEGORIA);';
+        let sql = 'select a.ID_PRODUCTO,b.ID_CATEGORIA,b.NOMBRE,b.DESCRIPCION from productos a INNER JOIN categorias B ON (a.ID_CATEGORIA = b.ID_CATEGORIA);';
         BD.query(sql, (err, PRODUCTOS) => {
             if (err) {
                 res.send(err)
@@ -86,7 +86,7 @@ rutas.post('/detalles-products/:id', (req, res) => {
 rutas.get('/pedidos/:id', (req, res) => {
     if (BD) {
         const id = req.params.id;
-        let sql = 'SELECT ID_PEDIDO,FECHA_PEDIDO,FECHA_ENTREGA,STATUS FROM PEDIDOS WHERE STATUS = ?;';
+        let sql = 'SELECT ID_PEDIDO,FECHA_PEDIDO,FECHA_ENTREGA,STATUS FROM pedidos WHERE STATUS = ?;';
         BD.query(sql, [id], (err, rows) => {
             if (err) {
                 res.send(err)
