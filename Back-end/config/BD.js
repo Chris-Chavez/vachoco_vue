@@ -3,8 +3,8 @@ const mysql = require('mysql');
 const objectConnection = {
     "host": "db-mysql-vachoco-do-user-11722385-0.b.db.ondigitalocean.com",
     "port": 25060,
-    "user": "doadmin",
-    "password": "AVNS_DMWGfWUBlEpqeFs",
+    "user": "vachoco",
+    "password": "AVNS_us4oegE2Ppp_4Rm",
     "database": "vachoco"
 }
 
