@@ -237,6 +237,7 @@ export default {
         }
       });
       if (exis) {
+        
        return;
       }
       this.$emit("res", {
