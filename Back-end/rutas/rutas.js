@@ -6,7 +6,7 @@ const { execFile, exec, spawn } = require("child_process");
 
 rutas.post('/python', function (req, res) {
     const subprocess = spawn("python", [
-        path.join('../python/Pedidos.py'),
+        path.join('./python/Pedidos.py'),
     ]);
     subprocess.on("close", (code) => {
         res.json(code)
