@@ -71,6 +71,11 @@
                         v-model="editedItem.CANTIDAD"
                         type="number"
                         label="CANTIDAD"
+                        :rules="[
+                          rules.required,
+                          (v) =>
+                            v < editedItem.EXISTENCIA || 'Cantidad Erronea',
+                        ]"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="4">
@@ -121,7 +126,12 @@ import { mapActions } from "vuex";
 export default {
   props: ["name", "items", "cliente", "toggle", "edit"],
   data: () => ({
+    valid: false,
     dialog: false,
+    rules: {
+      required: (v) => !!v || "Informacion requerida",
+      Cantidad: (v) => v < this.editedItem.EXISTENCIA || "Cantidad Erronea",
+    },
     headers: [
       {
         text: "Producto",
@@ -152,6 +162,12 @@ export default {
   computed: {
     formTitle() {
       return this.editedIndex === -1 ? "New Item" : "Editar Pedido";
+    },
+    Cantidad() {
+      return this.editedItem.CANTIDAD < this.editedItem.EXISTENCIA;
+    },
+    Vacio() {
+      return this.editedItem.CANTIDAD <= 0;
     },
   },
 
@@ -202,15 +218,27 @@ export default {
     },
 
     save() {
-      if (this.editedIndex > -1) {
-        Object.assign(this.items[this.editedIndex], this.editedItem);
+      if (this.Cantidad && !this.Vacio) {
+        if (this.editedIndex > -1) {
+          Object.assign(this.items[this.editedIndex], this.editedItem);
+        }
+        this.close();
       }
-      this.close();
     },
     cerrardialog() {
       this.$emit("toggle", false);
     },
     ConfirmarPedido() {
+      var exis;
+      this.items.forEach((el) => {
+        if (el.CANTIDAD > el.EXISTENCIA) {
+          exis = true;
+          return;
+        }
+      });
+      if (exis) {
+       return;
+      }
       this.$emit("res", {
         ID_PEDIDO: this.name,
         ID_CLIENTE: this.cliente[0].ID_CLIENTE,

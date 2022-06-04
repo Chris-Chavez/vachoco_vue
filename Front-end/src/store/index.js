@@ -24,13 +24,13 @@ export default new Vuex.Store({
   actions: {
     setDetallePedido({commit}, {id, onComplete, onError}) {
       commit('SET_LOADING', true)
-      axios.post(`http://localhost:3000/detalles-pedidos/${id}`)
+      axios.post(`https://shark-app-zh2h5.ondigitalocean.app/detalles-pedidos/${id}`)
       .then(onComplete)
       .catch(onError)
     },
     setPedidos({commit}, {id}){
       commit('SET_LOADING', true)
-      axios.get(`http://localhost:3000/pedidos/${id}`)
+      axios.get(`https://shark-app-zh2h5.ondigitalocean.app/pedidos/${id}`)
       .then(response => {
         var Aux = [];
         response.data.forEach(element => {
@@ -42,31 +42,31 @@ export default new Vuex.Store({
     },
     Login({commit}, {params, onComplete, onError}) {
       commit('SET_LOADING', true)
-      axios.post('http://localhost:3000/Login', params)
+      axios.post('https://shark-app-zh2h5.ondigitalocean.app/Login', params)
       .then(onComplete)
       .catch(onError)
     },
     setCliente({commit}, {id, onComplete, onError}) {
       commit('SET_LOADING', true)
-      axios.post(`http://localhost:3000/Cliente/${id}`)
+      axios.post(`https://shark-app-zh2h5.ondigitalocean.app/Cliente/${id}`)
       .then(onComplete)
       .catch(onError)
     },
     setproductoCat({commit}, {id, onComplete, onError}) {
       commit('SET_LOADING', true)
-      axios.post(`http://localhost:3000/products-cat/${id}`)
+      axios.post(`https://shark-app-zh2h5.ondigitalocean.app/products-cat/${id}`)
       .then(onComplete)
       .catch(onError)
     },
     productInfo({commit}, {id, onComplete, onError}) {
       commit('SET_LOADING', true)
-      axios.post(`http://localhost:3000/detalles-products/${id}`)
+      axios.post(`https://shark-app-zh2h5.ondigitalocean.app/detalles-products/${id}`)
       .then(onComplete)
       .catch(onError)
     },
     confirmaPedido({commit}, {id ,params, onComplete, onError}) {
       commit('SET_LOADING', true)
-      axios.put(`http://localhost:3000/Act-Estado-Prod/${id}`, params)
+      axios.put(`https://shark-app-zh2h5.ondigitalocean.app/Act-Estado-Prod/${id}`, params)
       .then(onComplete)
       .catch(onError)
     },
