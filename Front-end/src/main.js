@@ -4,10 +4,11 @@ import './registerServiceWorker'
 import router from './router'
 import store from './store'
 import vuetify from './plugins/vuetify'
+import VueSimpleAlert from 'vue-simple-alert'
 import "./assets/styles.scss";
 
 Vue.config.productionTip = false
-
+Vue.use(VueSimpleAlert);
 new Vue({
   router,
   store,

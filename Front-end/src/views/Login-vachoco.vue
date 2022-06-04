@@ -73,24 +73,18 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["LoginEmpleados"]),
+    ...mapActions(["LoginEmpleados", "EjecutaPython"]),
     async submit() {
       const valid = await this.$refs.form.validate();
       if (valid) {
-        this.Login({
+        this.LoginEmpleados({
           params: { user: this.email, pass: this.password },
           onComplete: (response) => {
-            if (response.data.length == 0) {
-              alert('Usuario o contraseña incorrecta')
+            if (response.data[0].respuesta == 0) {
+              this.$alert("Usuario o contraseña incorrecta", "", "error");
               return;
             }
-            if (
-              response.data[0][0].PASSWORD == this.password &&
-              response.data[0][0].USERNAME == this.email
-            ) {
-              localStorage.setItem("ID_USUARIO", response.data[0][0].ID_USUARIO);
-              this.$router.replace("/AppLayout"); // action to login
-            }
+            this.EjecutaPython().then(this.$router.replace("/AppLayout"));
           },
           onError: (error) => {
             console.log(error);

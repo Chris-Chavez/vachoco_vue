@@ -13,20 +13,6 @@ rutas.post('/python', function (req, res) {
     })
 });
 
-rutas.get('/Productos', (req, res) => {
-    if (BD) {
-        let sql = 'select a.ID_PRODUCTO,b.ID_CATEGORIA,b.NOMBRE,b.DESCRIPCION from productos a INNER JOIN categorias B ON (a.ID_CATEGORIA = b.ID_CATEGORIA);';
-        BD.query(sql, (err, PRODUCTOS) => {
-            if (err) {
-                res.send(err)
-            } else {
-                res.json(PRODUCTOS);
-            }
-        })
-    }
-}
-);
-
 rutas.get('/Categorias', (req, res) => {
     if (BD) {
         let sql = 'CALL sp_getCategories();';

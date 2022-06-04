@@ -22,6 +22,10 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    EjecutaPython({commit}) {
+      commit('SET_LOADING', true)
+      axios.post(`https://shark-app-zh2h5.ondigitalocean.app/python`)
+    },
     setDetallePedido({commit}, {id, onComplete, onError}) {
       commit('SET_LOADING', true)
       axios.post(`https://shark-app-zh2h5.ondigitalocean.app/detalles-pedidos/${id}`)

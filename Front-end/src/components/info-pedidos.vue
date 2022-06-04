@@ -74,7 +74,7 @@
                         :rules="[
                           rules.required,
                           (v) =>
-                            v < editedItem.EXISTENCIA || 'Cantidad Erronea',
+                            v <= editedItem.EXISTENCIA || 'Cantidad Erronea',
                         ]"
                       ></v-text-field>
                     </v-col>
@@ -218,9 +218,11 @@ export default {
     },
 
     save() {
+
       if (this.Cantidad && !this.Vacio) {
         if (this.editedIndex > -1) {
           Object.assign(this.items[this.editedIndex], this.editedItem);
+          this.$alert('Producto modificado correctamente','Modificacion Exitosa','success')
         }
         this.close();
       }

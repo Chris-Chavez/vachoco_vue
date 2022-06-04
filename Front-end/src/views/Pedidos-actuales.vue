@@ -100,7 +100,7 @@ export default {
     ],
     Pedidos: [],
     lastIndex: -1,
-    PedidosConfirmados: [{}],
+    PedidosConfirmados: [],
     SelectedIndex: 0,
     SelectedItem: {
       name: "",
@@ -146,9 +146,9 @@ export default {
     initialize() {
       this.setPedidos({ id: this.$route.params.id });
     },
-      itemRowBackground: function (item) {
-     return item.STATUS > 1 ? 'style-1' : 'style-2'
-  },
+    itemRowBackground: function (item) {
+      return item.STATUS > 1 ? "style-1" : "style-2";
+    },
     DetallesPedido(item, row) {
       row.select(true);
       this.SelectedIndex = this.allPedidos.indexOf(item);
@@ -189,7 +189,7 @@ export default {
             });
           });
           this.setCliente({
-            id: 1,
+            id: this.Detalles.ID_CLIENTE,
             onComplete: (response) => {
               this.Cliente = response.data;
             },
@@ -202,34 +202,55 @@ export default {
     },
     RespuestaPedido(items) {
       if (this.SelectedIndex > -1) {
-        this.modificados.push({ id: this.SelectedIndex, bool: true });
-        this.PedidosConfirmados.splice(
-          this.SelectedIndex,
-          1,
-          Object.assign(items)
-        );
+        if (this.PedidosConfirmados.length == 0) {
+          this.modificados.push({ id: this.SelectedIndex, bool: true });
+          this.PedidosConfirmados.push(Object.assign(items));
+        } else {
+          this.modificados.push({ id: this.SelectedIndex, bool: true });
+          this.PedidosConfirmados.splice(
+            this.SelectedIndex,
+            1,
+            Object.assign(items)
+          );
+        }
       }
     },
     ConfirmaPedidos() {
+      var cont = 0;
       if (this.selected.length != 0) {
-        for (let i = 0; i < this.selected.length; i++) {
-          if (
-            this.selected[i].ID_PEDIDO == this.PedidosConfirmados[i].ID_PEDIDO
-          ) {
-            this.PedidosConfirmados[i].Productos.forEach((element) => {
-              this.confirmaPedido({
-                id: element.ID_PRODUCTO,
-                params: {
-                  CANTIDAD: parseInt(element.CANTIDAD),
-                  ESTADO: 2,
-                  ID_SOLICITUD: element.ID_SOLICITUD,
-                },
+        this.$confirm(
+          "Esta acción no se puede deshacer",
+          "¿Esta seguro que desea confirmar los pedidos?",
+          "question"
+        ).then(async () => {
+          for (let i = 0; i < this.selected.length; i++) {
+            if (this.PedidosConfirmados[i] === undefined) {
+              continue;
+            }
+            if (this.selected[i].ID_PEDIDO == this.PedidosConfirmados[i].ID_PEDIDO) {
+              this.PedidosConfirmados[i].Productos.forEach((element) => {
+                this.confirmaPedido({
+                  id: element.ID_PRODUCTO,
+                  params: {
+                    CANTIDAD: parseInt(element.CANTIDAD),
+                    ESTADO: 2,
+                    ID_SOLICITUD: element.ID_SOLICITUD,
+                  },
+                });
               });
-            });
+              cont++;
+              this.initialize();
+            }
+            this.initialize();
           }
-        }
+          this.$alert(
+            "Se han modificado con exito un total de " + cont + " Pedidos",
+            "Confirmacion de pedidos",
+            "info"
+          ).then(this.initialize());
+          this.selected = [];
+        });
       }
-      this.initialize();
     },
   },
 };
