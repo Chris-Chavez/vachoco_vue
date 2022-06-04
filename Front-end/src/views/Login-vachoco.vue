@@ -73,7 +73,7 @@ export default {
     },
   },
   methods: {
-    ...mapActions(["Login"]),
+    ...mapActions(["LoginEmpleados"]),
     async submit() {
       const valid = await this.$refs.form.validate();
       if (valid) {

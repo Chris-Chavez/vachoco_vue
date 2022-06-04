@@ -118,6 +118,25 @@ rutas.post('/Login', (req, res) => {
     }
 });
 
+rutas.post('/Login2', (req, res) => {
+    if (BD) {
+        const usuario = req.body;
+        if (!usuario.user) {
+            return res.status(400).send({ error: true, mensaje: "El usuario es obligatorio" })
+        }
+        if (!usuario.pass) {
+            return res.status(400).send({ error: true, mensaje: "La PASSWORD es obligatoria" })
+        }
+        let sql = 'SELECT LoginEmpleados(?,?)';
+        BD.query(sql, [usuario.user,usuario.pass],(err, rows) => {
+            if (err) {
+                res.json(err);
+            } else {
+                res.json(rows);
+            }
+        })
+    }
+});
 
 rutas.put('/Act-Estado-Prod/:ID', (req, res) => {
     if (BD) {

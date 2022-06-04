@@ -46,6 +46,12 @@ export default new Vuex.Store({
       .then(onComplete)
       .catch(onError)
     },
+    LoginEmpleados({commit}, {params, onComplete, onError}) {
+      commit('SET_LOADING', true)
+      axios.post('https://shark-app-zh2h5.ondigitalocean.app/Login2', params)
+      .then(onComplete)
+      .catch(onError)
+    },
     setCliente({commit}, {id, onComplete, onError}) {
       commit('SET_LOADING', true)
       axios.post(`https://shark-app-zh2h5.ondigitalocean.app/Cliente/${id}`)
