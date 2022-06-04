@@ -5,7 +5,7 @@ const objectConnection = {
     "port": 25060,
     "user": "vachoco",
     "password": "AVNS_0asJA4mK5Yga9hc",
-    "database": "db-vachoco"
+    "database": "defaultdb"
 }
 
 const myConn = mysql.createConnection(objectConnection);
