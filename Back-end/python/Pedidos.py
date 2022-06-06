@@ -2,7 +2,6 @@
 
 import pymysql
 
-
 def main():
     try:
         miConexion = pymysql.connect(host='db-mysql-vachoco-do-user-11722385-0.b.db.ondigitalocean.com',

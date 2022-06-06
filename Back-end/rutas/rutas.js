@@ -177,12 +177,11 @@ rutas.put('/Act-Estado-Pedido/:ID', (req, res) => {
 rutas.put('/Act-Estado-Pedido-DIST/:ID', (req, res) => {
     if (BD) {
         const id = req.params.ID;
-        const ID_PEDIDO = req.body.ID_PEDIDO;
-        if (!ID_PEDIDO) {
+        if (!id) {
             return res.status(400).send({ error: true, mensaje: "El ID_PEDIDO es obligatorio" })
         }
-        let sql = 'update pedidos set STATUS = 3, FECHA_ENTREGA = NOW() WHERE ID_PEDIDO = ?;';
-        BD.query(sql, (err, rows) => {
+        let sql = `update pedidos set STATUS = 3, FECHA_ENTREGA = NOW() WHERE ID_PEDIDO = ${id};`;
+        BD.query(sql, [id],(err, rows) => {
             if (err) {
                 res.send(err)
             } else {
