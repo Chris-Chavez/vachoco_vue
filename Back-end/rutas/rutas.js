@@ -210,8 +210,11 @@ rutas.post('/Cliente/:id', (req, res) => {
 rutas.get('/Historial-cliente/:id', (req, res) => {
     if (BD) {
         const id = req.params.id;
-        let sql = 'SELECT P.ID_PEDIDO,P.FECHA_PEDIDO,P.FECHA_ENTREGA FROM pedidos P INNER JOIN solicitudes S ON (P.ID_SOLICITUD=S.ID_SOLICITUD) INNER JOIN clientes C ON (S.ID_CLIENTE = C.ID_CLIENTE) WHERE C.ID_CLIENTE = ? AND P.STATUS = 3;';
-        BD.query(sql, [id], (err, rows) => {
+        let sql = `SELECT P.ID_PEDIDO,S.ID_SOLICITUD,P.FECHA_PEDIDO,P.FECHA_ENTREGA,DS.ID_PRODUCTO,DS.CANTIDAD,DS.TIPO_MEDIDA FROM pedidos P 
+                    INNER JOIN solicitudes S ON (P.ID_SOLICITUD=S.ID_SOLICITUD)
+                    INNER JOIN detalle_solicitudes DS ON (S.ID_SOLICITUD=DS.ID_SOLICITUD)
+                    INNER JOIN clientes C ON (S.ID_CLIENTE = C.ID_CLIENTE) WHERE C.ID_CLIENTE = ${id} AND P.STATUS = 3;`;
+        BD.query(sql, (err, rows) => {
             if (err) {
                 res.send(err)
             } else {
