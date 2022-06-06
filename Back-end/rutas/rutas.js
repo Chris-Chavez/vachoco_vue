@@ -83,7 +83,7 @@ rutas.post('/detalles-products/:id', (req, res) => {
 rutas.get('/pedidos/:id', (req, res) => {
     if (BD) {
         const id = req.params.id;
-        let sql = 'SELECT ID_PEDIDO,FECHA_PEDIDO,FECHA_ENTREGA,STATUS FROM pedidos WHERE STATUS = ?;';
+        let sql = 'SELECT DISTINCT(ID_PEDIDO),FECHA_PEDIDO,FECHA_ENTREGA,STATUS FROM pedidos WHERE STATUS = ?;';
         BD.query(sql, [id], (err, rows) => {
             if (err) {
                 res.send(err)
