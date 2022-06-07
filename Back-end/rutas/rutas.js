@@ -181,7 +181,7 @@ rutas.put('/Act-Estado-Pedido-DIST/:ID', (req, res) => {
             return res.status(400).send({ error: true, mensaje: "El ID_PEDIDO es obligatorio" })
         }
         let sql = `update pedidos set STATUS = 3, FECHA_ENTREGA = NOW() WHERE ID_PEDIDO = ${id};`;
-        BD.query(sql, [id],(err, rows) => {
+        BD.query(sql, [id], (err, rows) => {
             if (err) {
                 res.send(err)
             } else {
@@ -210,12 +210,72 @@ rutas.post('/Cliente/:id', (req, res) => {
 rutas.get('/Historial-cliente/:id', (req, res) => {
     if (BD) {
         const id = req.params.id;
-        let sql = `SELECT P.ID_PEDIDO,S.ID_SOLICITUD,P.FECHA_PEDIDO,P.FECHA_ENTREGA,DS.ID_PRODUCTO,DP.NOMBRE,DS.CANTIDAD,DS.TIPO_MEDIDA FROM pedidos P 
+        let sql = `SELECT P.ID_PEDIDO,S.ID_SOLICITUD,P.FECHA_PEDIDO,P.FECHA_ENTREGA,P.STATUS,DS.ID_PRODUCTO,DP.NOMBRE,DS.CANTIDAD,DS.TIPO_MEDIDA FROM pedidos P 
                     INNER JOIN solicitudes S ON (P.ID_SOLICITUD=S.ID_SOLICITUD)
                     INNER JOIN detalle_solicitudes DS ON (S.ID_SOLICITUD=DS.ID_SOLICITUD)
                     INNER JOIN detalle_productos DP ON (DP.ID_PRODUCTO = DS.ID_PRODUCTO)
                     INNER JOIN clientes C ON (S.ID_CLIENTE = C.ID_CLIENTE) WHERE C.ID_CLIENTE = ${id} AND P.STATUS = 3;`;
         BD.query(sql, (err, rows) => {
+            if (err) {
+                res.send(err)
+            } else {
+                var cont = 0;
+                var array = [];
+                for (let i = 0; i < rows.length; i++) {
+                    if (i == 0) {
+                        array.push({
+                            ID_PEDIDO: rows[i]['ID_PEDIDO'],
+                            FECHA_PEDIDO: rows[i]['FECHA_PEDIDO'],
+                            FECHA_ENTREGA: rows[i]['FECHA_ENTREGA'],
+                            STATUS: rows[i]['STATUS'],
+                            PRODUCTOS: [{
+                                ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
+                                NOMBRE: rows[i]['NOMBRE'],
+                                CANTIDAD: rows[i]['CANTIDAD'],
+                                TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
+                            }]
+                        });
+                        continue;
+                    }
+                    if (i != 0) {
+                        if (rows[i]['ID_PEDIDO'] != rows[i - 1]['ID_PEDIDO']) {
+                            cont++;
+                            array.push({
+                                ID_PEDIDO: rows[i]['ID_PEDIDO'],
+                                FECHA_PEDIDO: rows[i]['FECHA_PEDIDO'],
+                                FECHA_ENTREGA: rows[i]['FECHA_ENTREGA'],
+                                STATUS: rows[i]['STATUS'],
+                                PRODUCTOS: [{
+                                    ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
+                                    NOMBRE: rows[i]['NOMBRE'],
+                                    CANTIDAD: rows[i]['CANTIDAD'],
+                                    TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
+                                }]
+                            });
+                        }
+                    }
+                    array[cont].PRODUCTOS.push({
+                        ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
+                        NOMBRE: rows[i]['NOMBRE'],
+                        CANTIDAD: rows[i]['CANTIDAD'],
+                        TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
+                    });
+                }
+                res.json(array);
+            }
+        })
+    }
+}
+);
+
+
+rutas.post('/Registra-pedido', (req, res) => {
+    if (BD) {
+        const ID = req.params.id;
+        const Array = req.body.Array;
+
+        let sql = `call LevantarPedido(${Cliente},${productos},${cantidades})`;
+        BD.query(sql, [ID], (err, rows) => {
             if (err) {
                 res.send(err)
             } else {
