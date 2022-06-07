@@ -233,7 +233,7 @@ rutas.get('/Historial-cliente/:id', (req, res) => {
                 var array =
                 {
                     ID_CLIENTE: rows[0]['ID_CLIENTE'],
-                    NOMBRE_EMPRESA: rows[0]['ID_CLIENTE'],
+                    NOMBRE_EMPRESA: rows[0]['NOMBRE_EMPRESA'],
                     RFC: rows[0]['RFC'],
                     EMAIL: rows[0]['EMAIL'],
                     DOMICILIO: rows[0]['DOMICILIO'],
@@ -310,7 +310,7 @@ rutas.get('/Historial-distribuidor', (req, res) => {
                     if (i == 0) {
                         array.push({
                             ID_CLIENTE: rows[i]['ID_CLIENTE'],
-                            NOMBRE_EMPRESA: rows[i]['ID_CLIENTE'],
+                            NOMBRE_EMPRESA: rows[i]['NOMBRE_EMPRESA'],
                             RFC: rows[i]['RFC'],
                             EMAIL: rows[i]['EMAIL'],
                             DOMICILIO: rows[i]['DOMICILIO'],
@@ -333,7 +333,7 @@ rutas.get('/Historial-distribuidor', (req, res) => {
                             cont++;
                             array.push({
                                 ID_CLIENTE: rows[i]['ID_CLIENTE'],
-                                NOMBRE_EMPRESA: rows[i]['ID_CLIENTE'],
+                                NOMBRE_EMPRESA: rows[i]['NOMBRE_EMPRESA'],
                                 RFC: rows[i]['RFC'],
                                 EMAIL: rows[i]['EMAIL'],
                                 DOMICILIO: rows[i]['DOMICILIO'],
