@@ -210,23 +210,37 @@ rutas.post('/Cliente/:id', (req, res) => {
 rutas.get('/Historial-cliente/:id', (req, res) => {
     if (BD) {
         const id = req.params.id;
-        let sql = `SELECT P.ID_PEDIDO,S.ID_SOLICITUD,P.FECHA_PEDIDO,P.FECHA_ENTREGA,P.STATUS,DS.ID_PRODUCTO,DP.NOMBRE,DS.CANTIDAD,DS.TIPO_MEDIDA FROM pedidos P 
-                    INNER JOIN solicitudes S ON (P.ID_SOLICITUD=S.ID_SOLICITUD)
-                    INNER JOIN detalle_solicitudes DS ON (S.ID_SOLICITUD=DS.ID_SOLICITUD)
-                    INNER JOIN detalle_productos DP ON (DP.ID_PRODUCTO = DS.ID_PRODUCTO)
-                    INNER JOIN clientes C ON (S.ID_CLIENTE = C.ID_CLIENTE) WHERE C.ID_CLIENTE = ${id} AND P.STATUS = 3;`;
+        let sql = `SELECT 
+        P.ID_PEDIDO,S.ID_SOLICITUD,P.FECHA_PEDIDO,P.FECHA_ENTREGA,P.STATUS,DS.ID_PRODUCTO,DP.NOMBRE,DS.CANTIDAD,
+        DS.TIPO_MEDIDA,C.ID_CLIENTE,C.NOMBRE_EMPRESA,C.RFC,C.EMAIL,C.TELEFONO,C.DOMICILIO,C.CIUDAD
+        FROM
+            pedidos P 
+            INNER JOIN solicitudes S ON (P.ID_SOLICITUD = S.ID_SOLICITUD) 
+            INNER JOIN detalle_solicitudes DS ON (S.ID_SOLICITUD = DS.ID_SOLICITUD)
+            INNER JOIN detalle_productos DP ON (DP.ID_PRODUCTO = DS.ID_PRODUCTO)
+            INNER JOIN clientes C ON (S.ID_CLIENTE = C.ID_CLIENTE) 
+            WHERE C.ID_CLIENTE = ${id} AND P.STATUS = 3;`;
         BD.query(sql, (err, rows) => {
             if (err) {
                 res.send(err)
             } else {
                 var cont = 0;
-                var array = [];
+                var array =
+                {
+                    ID_CLIENTE: rows[0]['ID_CLIENTE'],
+                    NOMBRE_EMPRESA: rows[0]['ID_CLIENTE'],
+                    RFC: rows[0]['RFC'],
+                    EMAIL: rows[0]['EMAIL'],
+                    DOMICILIO: rows[0]['DOMICILIO'],
+                    CIUDAD: rows[0]['CIUDAD'],
+                    PEDIDOS: []
+                };
                 for (let i = 0; i < rows.length; i++) {
                     if (i == 0) {
-                        array.push({
+                        array.PEDIDOS.push({
                             ID_PEDIDO: rows[i]['ID_PEDIDO'],
-                            FECHA_PEDIDO: rows[i]['FECHA_PEDIDO'],
-                            FECHA_ENTREGA: rows[i]['FECHA_ENTREGA'],
+                            FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0,10),
+                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0,10),
                             STATUS: rows[i]['STATUS'],
                             PRODUCTOS: [{
                                 ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
@@ -240,10 +254,10 @@ rutas.get('/Historial-cliente/:id', (req, res) => {
                     if (i != 0) {
                         if (rows[i]['ID_PEDIDO'] != rows[i - 1]['ID_PEDIDO']) {
                             cont++;
-                            array.push({
+                            array.PEDIDOS.push({
                                 ID_PEDIDO: rows[i]['ID_PEDIDO'],
-                                FECHA_PEDIDO: rows[i]['FECHA_PEDIDO'],
-                                FECHA_ENTREGA: rows[i]['FECHA_ENTREGA'],
+                                FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0,10),
+                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0,10),
                                 STATUS: rows[i]['STATUS'],
                                 PRODUCTOS: [{
                                     ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
@@ -254,7 +268,7 @@ rutas.get('/Historial-cliente/:id', (req, res) => {
                             });
                         }
                     }
-                    array[cont].PRODUCTOS.push({
+                    array.PEDIDOS[cont].PRODUCTOS.push({
                         ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
                         NOMBRE: rows[i]['NOMBRE'],
                         CANTIDAD: rows[i]['CANTIDAD'],
@@ -268,6 +282,105 @@ rutas.get('/Historial-cliente/:id', (req, res) => {
 }
 );
 
+rutas.get('/Historial-distribuidor', (req, res) => {
+    if (BD) {
+        const id = req.params.id;
+        let sql = `SELECT 
+        P.ID_PEDIDO,S.ID_SOLICITUD,P.FECHA_PEDIDO,P.FECHA_ENTREGA,P.STATUS,DS.ID_PRODUCTO,DP.NOMBRE,DS.CANTIDAD,
+        DS.TIPO_MEDIDA,C.ID_CLIENTE,C.NOMBRE_EMPRESA,C.RFC,C.EMAIL,C.TELEFONO,C.DOMICILIO,C.CIUDAD
+        FROM
+            pedidos P 
+            INNER JOIN solicitudes S ON (P.ID_SOLICITUD = S.ID_SOLICITUD) 
+            INNER JOIN detalle_solicitudes DS ON (S.ID_SOLICITUD = DS.ID_SOLICITUD)
+            INNER JOIN detalle_productos DP ON (DP.ID_PRODUCTO = DS.ID_PRODUCTO)
+            INNER JOIN clientes C ON (S.ID_CLIENTE = C.ID_CLIENTE) 
+            WHERE P.STATUS = 3;`;
+        BD.query(sql, (err, rows) => {
+            if (err) {
+                res.send(err)
+            } else {
+                var cont = 0;
+                var cliente = 0;
+                var array = [];
+                for (let i = 0; i < rows.length; i++) {
+                    if (i == 0) {
+                        array.push({
+                            ID_CLIENTE: rows[i]['ID_CLIENTE'],
+                            NOMBRE_EMPRESA: rows[i]['ID_CLIENTE'],
+                            RFC: rows[i]['RFC'],
+                            EMAIL: rows[i]['EMAIL'],
+                            DOMICILIO: rows[i]['DOMICILIO'],
+                            CIUDAD: rows[i]['CIUDAD'],
+                            PEDIDOS: [{
+                                ID_PEDIDO: rows[i]['ID_PEDIDO'],
+                                FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0,10),
+                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0,10),
+                                STATUS: rows[i]['STATUS'],
+                                PRODUCTOS: [{
+                                    ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
+                                    NOMBRE: rows[i]['NOMBRE'],
+                                    CANTIDAD: rows[i]['CANTIDAD'],
+                                    TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
+                                }]
+                            }]
+                        });
+                        continue;
+                    }
+                    if (i != 0) {
+                        if (rows[i]['ID_CLIENTE'] != rows[i - 1]['ID_CLIENTE']) {
+                            cliente++;
+                            array.push({
+                                ID_CLIENTE: rows[i]['ID_CLIENTE'],
+                                NOMBRE_EMPRESA: rows[i]['ID_CLIENTE'],
+                                RFC: rows[i]['RFC'],
+                                EMAIL: rows[i]['EMAIL'],
+                                DOMICILIO: rows[i]['DOMICILIO'],
+                                CIUDAD: rows[i]['CIUDAD'],
+                                PEDIDOS: [{
+                                    ID_PEDIDO: rows[i]['ID_PEDIDO'],
+                                    FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0,10),
+                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0,10),
+                                    STATUS: rows[i]['STATUS'],
+                                    PRODUCTOS: [{
+                                        ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
+                                        NOMBRE: rows[i]['NOMBRE'],
+                                        CANTIDAD: rows[i]['CANTIDAD'],
+                                        TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
+                                    }]
+                                }]
+                            });
+                            continue;
+                        }
+                        if (rows[i]['ID_PEDIDO'] != rows[i - 1]['ID_PEDIDO']) {
+                            cont++;
+                            array[cliente].PEDIDOS.push({
+                                ID_PEDIDO: rows[i]['ID_PEDIDO'],
+                                FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0,10),
+                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0,10),
+                                STATUS: rows[i]['STATUS'],
+                                PRODUCTOS: [{
+                                    ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
+                                    NOMBRE: rows[i]['NOMBRE'],
+                                    CANTIDAD: rows[i]['CANTIDAD'],
+                                    TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
+                                }]
+                            });
+                        }
+
+                    }
+                    array[cliente].PEDIDOS[cont].PRODUCTOS.push({
+                        ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
+                        NOMBRE: rows[i]['NOMBRE'],
+                        CANTIDAD: rows[i]['CANTIDAD'],
+                        TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
+                    });
+                }
+                res.json(array);
+            }
+        })
+    }
+}
+);
 
 rutas.post('/Registra-pedido', (req, res) => {
     if (BD) {

@@ -22,9 +22,10 @@ export default new Vuex.Store({
     }
   },
   actions: {
-    EjecutaPython({commit}) {
+    EjecutaPython({commit}, {onComplete}) {
       commit('SET_LOADING', true)
       axios.post(`https://shark-app-zh2h5.ondigitalocean.app/python`)
+      .then(onComplete)
     },
     setDetallePedido({commit}, {id, onComplete, onError}) {
       commit('SET_LOADING', true)
@@ -38,7 +39,7 @@ export default new Vuex.Store({
       .then(response => {
         var Aux = [];
         response.data.forEach(element => {
-          Aux.push({ID_PEDIDO: element.ID_PEDIDO,FECHA_PEDIDO: new Date(element.FECHA_PEDIDO).toLocaleDateString(),FECHA_ENTREGA: new Date(element.FECHA_ENTREGA).toLocaleDateString(),STATUS:element.STATUS})
+          Aux.push({ID_PEDIDO: element.ID_PEDIDO,FECHA_PEDIDO: new Date(element.FECHA_PEDIDO).toISOString().substring(0,10),FECHA_ENTREGA: new Date(element.FECHA_ENTREGA).toISOString().substring(0,10),STATUS:element.STATUS})
         });
         commit('SET_PEDIDOS', Aux)
       })
