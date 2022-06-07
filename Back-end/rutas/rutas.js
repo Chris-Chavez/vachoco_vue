@@ -104,7 +104,7 @@ rutas.post('/Login', (req, res) => {
         if (!usuario.pass) {
             return res.status(400).send({ error: true, mensaje: "La PASSWORD es obligatoria" })
         }
-        let sql = 'CALL sp_login(?,?)';
+        let sql = 'SELECT LoginApp(?,?) AS response;';
         BD.query(sql, [usuario.user, usuario.pass], (err, rows) => {
             if (err) {
                 res.json(err);
