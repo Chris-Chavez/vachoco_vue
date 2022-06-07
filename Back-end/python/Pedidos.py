@@ -3,6 +3,7 @@
 import pymysql
 
 def main():
+    cont = 0
     try:
         miConexion = pymysql.connect(host='db-mysql-vachoco-do-user-11722385-0.b.db.ondigitalocean.com',
                                      user='vachoco',
@@ -35,9 +36,11 @@ def main():
                     sql = 'update detalle_solicitudes set CANTIDAD = %i, ESTADO = 2 WHERE ID_SOLICITUD = %i AND ' \
                           'ID_PRODUCTO = %i;' % (detalle[7], detalle[5], detalle[6])
                     cur.execute(sql)
+                    cont += 1
                     miConexion.commit()
 
         miConexion.close()
+        print(cont)
     except Exception as error:
         print(error)
 

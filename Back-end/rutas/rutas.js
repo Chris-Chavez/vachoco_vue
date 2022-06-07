@@ -223,7 +223,7 @@ rutas.get('/Historial-cliente/:id', (req, res) => {
             INNER JOIN detalle_solicitudes DS ON (S.ID_SOLICITUD = DS.ID_SOLICITUD)
             INNER JOIN detalle_productos DP ON (DP.ID_PRODUCTO = DS.ID_PRODUCTO)
             INNER JOIN clientes C ON (S.ID_CLIENTE = C.ID_CLIENTE) 
-            WHERE C.ID_CLIENTE = ${id};`;
+            WHERE C.ID_CLIENTE = ${id} ORDER BY P.ID_PEDIDO DESC;`;
         BD.query(sql, (err, rows) => {
             if (err) {
                 res.send(err)
@@ -299,7 +299,7 @@ rutas.get('/Historial-distribuidor', (req, res) => {
             INNER JOIN detalle_solicitudes DS ON (S.ID_SOLICITUD = DS.ID_SOLICITUD)
             INNER JOIN detalle_productos DP ON (DP.ID_PRODUCTO = DS.ID_PRODUCTO)
             INNER JOIN clientes C ON (S.ID_CLIENTE = C.ID_CLIENTE) 
-            WHERE P.STATUS IN (2,3);`;
+            WHERE P.STATUS IN (2,3) ORDER BY P.ID_PEDIDO DESC;`;
         BD.query(sql, (err, rows) => {
             if (err) {
                 console.log(err);
