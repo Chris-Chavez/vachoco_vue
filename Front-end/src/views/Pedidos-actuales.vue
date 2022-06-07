@@ -126,7 +126,6 @@ export default {
           this.showselect = true;
           this.showedit = true;
         } else {
-          console.log(this.$route.params.id);
           this.showselect = false;
           this.showedit = false;
         }

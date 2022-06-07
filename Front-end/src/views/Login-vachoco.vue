@@ -84,7 +84,11 @@ export default {
               this.$alert("Usuario o contraseña incorrecta", "", "error");
               return;
             }
-            this.EjecutaPython().then(this.$router.replace("/AppLayout"));
+            this.EjecutaPython({
+              onComplete: (response) => {
+                console.log(response);
+              },
+            }).then(this.$router.replace("/AppLayout"));
           },
           onError: (error) => {
             console.log(error);

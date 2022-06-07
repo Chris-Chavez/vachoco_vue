@@ -69,12 +69,15 @@
                     <v-col cols="12" sm="6" md="4">
                       <v-text-field
                         v-model="editedItem.CANTIDAD"
+                        onkeypress="return (event.charCode >= 48 && event.charCode <= 57)"
+                        v-on:keydown="return (event.ctrlKey && (event.charCode == 86))"
                         type="number"
                         label="CANTIDAD"
                         :rules="[
                           rules.required,
-                          (v) =>
-                            v <= editedItem.EXISTENCIA || 'Cantidad Erronea',
+                          (v) => (v <= editedItem.EXISTENCIA) || 'Cantidad Errónea',
+                          (v) => (v >= 0) || 'Cantidad Errónea',
+                          (v) => v != 0 || 'Ingrese una Cantidad válida',
                         ]"
                       ></v-text-field>
                     </v-col>
@@ -130,7 +133,6 @@ export default {
     dialog: false,
     rules: {
       required: (v) => !!v || "Informacion requerida",
-      Cantidad: (v) => v < this.editedItem.EXISTENCIA || "Cantidad Erronea",
     },
     headers: [
       {
@@ -164,7 +166,7 @@ export default {
       return this.editedIndex === -1 ? "New Item" : "Editar Pedido";
     },
     Cantidad() {
-      return this.editedItem.CANTIDAD < this.editedItem.EXISTENCIA;
+      return (this.editedItem.CANTIDAD < this.editedItem.EXISTENCIA && this.editedItem.CANTIDAD > 0);
     },
     Vacio() {
       return this.editedItem.CANTIDAD <= 0;
@@ -207,6 +209,7 @@ export default {
         },
       });
       this.dialog = true;
+      console.log(item);
     },
 
     close() {
@@ -218,11 +221,14 @@ export default {
     },
 
     save() {
-
       if (this.Cantidad && !this.Vacio) {
         if (this.editedIndex > -1) {
           Object.assign(this.items[this.editedIndex], this.editedItem);
-          this.$alert('Producto modificado correctamente','Modificacion Exitosa','success')
+          this.$alert(
+            "Producto modificado correctamente",
+            "Modificacion Exitosa",
+            "success"
+          );
         }
         this.close();
       }
@@ -239,8 +245,7 @@ export default {
         }
       });
       if (exis) {
-        
-       return;
+        return;
       }
       this.$emit("res", {
         ID_PEDIDO: this.name,
