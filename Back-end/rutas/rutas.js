@@ -106,10 +106,15 @@ rutas.post('/Login', (req, res) => {
         }
         let sql = 'SELECT LoginApp(?,?) AS response;';
         BD.query(sql, [usuario.user, usuario.pass], (err, rows) => {
+            var array = rows[0].response.split('|');
+            var obj = {
+                RESPONSE: array[0],
+                ID_USUARIO: array[1]
+            }
             if (err) {
                 res.json(err);
             } else {
-                res.json(rows);
+                res.json(obj);
             }
         })
     }
@@ -239,8 +244,8 @@ rutas.get('/Historial-cliente/:id', (req, res) => {
                     if (i == 0) {
                         array.PEDIDOS.push({
                             ID_PEDIDO: rows[i]['ID_PEDIDO'],
-                            FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0,10),
-                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0,10),
+                            FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0, 10),
+                            FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0, 10),
                             STATUS: rows[i]['STATUS'],
                             PRODUCTOS: [{
                                 ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
@@ -256,8 +261,8 @@ rutas.get('/Historial-cliente/:id', (req, res) => {
                             cont++;
                             array.PEDIDOS.push({
                                 ID_PEDIDO: rows[i]['ID_PEDIDO'],
-                                FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0,10),
-                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0,10),
+                                FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0, 10),
+                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0, 10),
                                 STATUS: rows[i]['STATUS'],
                                 PRODUCTOS: [{
                                     ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
@@ -294,13 +299,12 @@ rutas.get('/Historial-distribuidor', (req, res) => {
             INNER JOIN detalle_solicitudes DS ON (S.ID_SOLICITUD = DS.ID_SOLICITUD)
             INNER JOIN detalle_productos DP ON (DP.ID_PRODUCTO = DS.ID_PRODUCTO)
             INNER JOIN clientes C ON (S.ID_CLIENTE = C.ID_CLIENTE) 
-            WHERE P.STATUS = 3;`;
+            WHERE P.STATUS = 2;`;
         BD.query(sql, (err, rows) => {
             if (err) {
                 res.send(err)
             } else {
                 var cont = 0;
-                var cliente = 0;
                 var array = [];
                 for (let i = 0; i < rows.length; i++) {
                     if (i == 0) {
@@ -311,24 +315,22 @@ rutas.get('/Historial-distribuidor', (req, res) => {
                             EMAIL: rows[i]['EMAIL'],
                             DOMICILIO: rows[i]['DOMICILIO'],
                             CIUDAD: rows[i]['CIUDAD'],
-                            PEDIDOS: [{
-                                ID_PEDIDO: rows[i]['ID_PEDIDO'],
-                                FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0,10),
-                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0,10),
-                                STATUS: rows[i]['STATUS'],
-                                PRODUCTOS: [{
-                                    ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
-                                    NOMBRE: rows[i]['NOMBRE'],
-                                    CANTIDAD: rows[i]['CANTIDAD'],
-                                    TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
-                                }]
+                            ID_PEDIDO: rows[i]['ID_PEDIDO'],
+                            FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0, 10),
+                            FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0, 10),
+                            STATUS: rows[i]['STATUS'],
+                            PRODUCTOS: [{
+                                ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
+                                NOMBRE: rows[i]['NOMBRE'],
+                                CANTIDAD: rows[i]['CANTIDAD'],
+                                TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
                             }]
                         });
                         continue;
                     }
                     if (i != 0) {
-                        if (rows[i]['ID_CLIENTE'] != rows[i - 1]['ID_CLIENTE']) {
-                            cliente++;
+                        if (rows[i]['ID_PEDIDO'] != rows[i - 1]['ID_PEDIDO']) {
+                            cont++;
                             array.push({
                                 ID_CLIENTE: rows[i]['ID_CLIENTE'],
                                 NOMBRE_EMPRESA: rows[i]['ID_CLIENTE'],
@@ -336,27 +338,9 @@ rutas.get('/Historial-distribuidor', (req, res) => {
                                 EMAIL: rows[i]['EMAIL'],
                                 DOMICILIO: rows[i]['DOMICILIO'],
                                 CIUDAD: rows[i]['CIUDAD'],
-                                PEDIDOS: [{
-                                    ID_PEDIDO: rows[i]['ID_PEDIDO'],
-                                    FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0,10),
-                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0,10),
-                                    STATUS: rows[i]['STATUS'],
-                                    PRODUCTOS: [{
-                                        ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
-                                        NOMBRE: rows[i]['NOMBRE'],
-                                        CANTIDAD: rows[i]['CANTIDAD'],
-                                        TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
-                                    }]
-                                }]
-                            });
-                            continue;
-                        }
-                        if (rows[i]['ID_PEDIDO'] != rows[i - 1]['ID_PEDIDO']) {
-                            cont++;
-                            array[cliente].PEDIDOS.push({
                                 ID_PEDIDO: rows[i]['ID_PEDIDO'],
-                                FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0,10),
-                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0,10),
+                                FECHA_PEDIDO: new Date(rows[i]['FECHA_PEDIDO']).toISOString().substring(0, 10),
+                                FECHA_ENTREGA: new Date(rows[i]['FECHA_ENTREGA']).toISOString().substring(0, 10),
                                 STATUS: rows[i]['STATUS'],
                                 PRODUCTOS: [{
                                     ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
@@ -366,9 +350,8 @@ rutas.get('/Historial-distribuidor', (req, res) => {
                                 }]
                             });
                         }
-
                     }
-                    array[cliente].PEDIDOS[cont].PRODUCTOS.push({
+                    array[cont].PRODUCTOS.push({
                         ID_PRODUCTO: rows[i]['ID_PRODUCTO'],
                         NOMBRE: rows[i]['NOMBRE'],
                         CANTIDAD: rows[i]['CANTIDAD'],
@@ -387,9 +370,9 @@ rutas.post('/Registra-pedido', (req, res) => {
         const ID = req.params.id;
         const Array = req.body;
         const Cliente = Array.UserId;
-        const Productos =Array.ProductList;
-        var productos= '';
-        var cantidades= ''
+        const Productos = Array.ProductList;
+        var productos = '';
+        var cantidades = ''
         for (let i = 0; i < Productos.length; i++) {
             productos = productos + Productos[i].Idprod + ',';
             cantidades = cantidades + Productos[i].Cantidad + ',';
@@ -399,7 +382,7 @@ rutas.post('/Registra-pedido', (req, res) => {
             if (err) {
                 res.send(err)
             } else {
-                res.json({response: 1});
+                res.json({ response: 1 });
             }
         })
     }
