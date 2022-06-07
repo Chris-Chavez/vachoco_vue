@@ -25,7 +25,7 @@
           <v-text-field
             v-model="password"
             label="Password"
-            :rules="[rules.required]"
+            :rules="[rules.required, rules.pass]"
             :append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
             @click:append="showPass = !showPass"
             required
@@ -62,6 +62,7 @@ export default {
           /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return pattern.test(value) || "Favor de ingresar un correo valido";
       },
+      pass: (value) => (value && value.length >= 6) || 'Mínimo 6 caracteres',
     },
   }),
   computed: {

@@ -224,7 +224,7 @@ rutas.get('/Historial-cliente/:id', (req, res) => {
             INNER JOIN detalle_solicitudes DS ON (S.ID_SOLICITUD = DS.ID_SOLICITUD)
             INNER JOIN detalle_productos DP ON (DP.ID_PRODUCTO = DS.ID_PRODUCTO)
             INNER JOIN clientes C ON (S.ID_CLIENTE = C.ID_CLIENTE) 
-            WHERE C.ID_CLIENTE = ${id} AND P.STATUS = 3;`;
+            WHERE C.ID_CLIENTE = ${id};`;
         BD.query(sql, (err, rows) => {
             if (err) {
                 res.send(err)

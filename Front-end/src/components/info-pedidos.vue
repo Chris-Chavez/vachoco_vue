@@ -70,7 +70,6 @@
                       <v-text-field
                         v-model="editedItem.CANTIDAD"
                         onkeypress="return (event.charCode >= 48 && event.charCode <= 57)"
-                        v-on:keydown="return (event.ctrlKey && (event.charCode == 86))"
                         type="number"
                         label="CANTIDAD"
                         :rules="[
