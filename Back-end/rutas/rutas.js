@@ -148,7 +148,6 @@ rutas.put('/Act-Estado-Prod/:ID', (req, res) => {
         const ID_SOLICITUD = req.body.ID_SOLICITUD;
 
         let sql = `update detalle_solicitudes set CANTIDAD = ${CANTIDAD}, ESTADO = ${ESTADO} WHERE ID_SOLICITUD = ${ID_SOLICITUD} AND ID_PRODUCTO = ${id};`;
-        console.log(sql)
         BD.query(sql, (err, rows) => {
             if (err) {
                 res.send(err)
@@ -271,6 +270,7 @@ rutas.get('/Historial-cliente/:id', (req, res) => {
                                     TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
                                 }]
                             });
+                            continue;
                         }
                     }
                     array.PEDIDOS[cont].PRODUCTOS.push({
@@ -302,6 +302,7 @@ rutas.get('/Historial-distribuidor', (req, res) => {
             WHERE P.STATUS IN (2,3);`;
         BD.query(sql, (err, rows) => {
             if (err) {
+                console.log(err);
                 res.send(err)
             } else {
                 var cont = 0;
@@ -349,6 +350,7 @@ rutas.get('/Historial-distribuidor', (req, res) => {
                                     TIPO_MEDIDA: rows[i]['TIPO_MEDIDA'],
                                 }]
                             });
+                            continue;
                         }
                     }
                     array[cont].PRODUCTOS.push({
@@ -377,13 +379,12 @@ rutas.post('/Registra-pedido', (req, res) => {
             productos = productos + Productos[i].Idprod + ',';
             cantidades = cantidades + Productos[i].Cantidad + ',';
         }
-        console.log('antes ',productos , cantidades)
         let sql = `call LevantarPedido(${Cliente},'${productos}','${cantidades}')`;
         BD.query(sql, (err) => {
             if (err) {
+                console.log(err);
                 res.send(err)
             } else {
-                console.log('despues ',productos , cantidades)
                 res.json({ response: 1 });
             }
         })
