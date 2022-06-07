@@ -82,7 +82,7 @@ export default {
           params: { user: this.email, pass: this.password },
           onComplete: (response) => {
             if (response.data[0].respuesta == 0) {
-              this.$alert("Usuario o contraseña incorrecta", "", "error");
+              this.$alert("Usuario o contraseña incorrecta", "Error al iniciar Sesión", "error");
               return;
             }
             this.EjecutaPython({

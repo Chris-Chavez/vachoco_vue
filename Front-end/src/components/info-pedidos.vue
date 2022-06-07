@@ -15,8 +15,8 @@
           >
             <v-row align="center" class="fill-height">
               <v-col align-self="end" class="pa-5" cols="12">
-                <v-avatar class="profile" color="grey" size="40%" tile>
-                  <v-img src="../assets/panama.png" width="100%"></v-img>
+                <v-avatar class="profile" color="white" size="40%" tile>
+                  <v-img src="../assets/Cliente.png" width="100%"></v-img>
                 </v-avatar>
               </v-col>
               <v-col class="py-0">
@@ -72,10 +72,16 @@
                         onkeypress="return (event.charCode >= 48 && event.charCode <= 57)"
                         type="number"
                         label="CANTIDAD"
+                        min="1"
+                        max="5"
+                        :counter="5"
+                        @paste="onPaste"
                         :rules="[
                           rules.required,
-                          (v) => (v <= editedItem.EXISTENCIA) || 'Cantidad Errónea',
-                          (v) => (v >= 0) || 'Cantidad Errónea',
+                          rules.numeros,
+                          (v) =>
+                            v <= editedItem.EXISTENCIA || 'Cantidad Errónea',
+                          (v) => v >= 0 || 'Cantidad Errónea',
                           (v) => v != 0 || 'Ingrese una Cantidad válida',
                         ]"
                       ></v-text-field>
@@ -132,6 +138,10 @@ export default {
     dialog: false,
     rules: {
       required: (v) => !!v || "Informacion requerida",
+      numeros: (v) => {
+        const pattern = /^[0-9]+$/;
+        return pattern.test(v) || "Cantidad Errónea";
+      },
     },
     headers: [
       {
@@ -165,7 +175,12 @@ export default {
       return this.editedIndex === -1 ? "New Item" : "Editar Pedido";
     },
     Cantidad() {
-      return (this.editedItem.CANTIDAD < this.editedItem.EXISTENCIA && this.editedItem.CANTIDAD > 0);
+      const pattern = /^[0-9]+$/;
+      return (
+        this.editedItem.CANTIDAD < this.editedItem.EXISTENCIA &&
+        this.editedItem.CANTIDAD > 0 &&
+        pattern.test(this.editedItem.CANTIDAD)
+      );
     },
     Vacio() {
       return this.editedItem.CANTIDAD <= 0;
@@ -193,6 +208,9 @@ export default {
     itemRowBackground: function (item) {
       return item.CANTIDAD <= item.EXISTENCIA ? "style2-1" : "style2-2";
     },
+    onPaste(evt) {
+      evt.preventDefault();
+    },
     editItem(item) {
       this.editedIndex = this.items.indexOf(item);
       this.editedItem = Object.assign({}, item);
@@ -208,7 +226,6 @@ export default {
         },
       });
       this.dialog = true;
-      console.log(item);
     },
 
     close() {
@@ -244,6 +261,11 @@ export default {
         }
       });
       if (exis) {
+        this.$alert(
+          "Un producto excede la existencia",
+          "Error Al Confirmar",
+          "error"
+        );
         return;
       }
       this.$emit("res", {
