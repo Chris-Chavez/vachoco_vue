@@ -378,10 +378,11 @@ rutas.post('/Registra-pedido', (req, res) => {
             cantidades = cantidades + Productos[i].Cantidad + ',';
         }
         let sql = `call LevantarPedido(${Cliente},'${productos}','${cantidades}')`;
-        BD.query(sql, (err, rows) => {
+        BD.query(sql, (err) => {
             if (err) {
                 res.send(err)
             } else {
+                console.log(productos , productos)
                 res.json({ response: 1 });
             }
         })
