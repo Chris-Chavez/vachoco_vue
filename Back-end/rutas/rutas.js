@@ -385,14 +385,21 @@ rutas.get('/Historial-distribuidor', (req, res) => {
 rutas.post('/Registra-pedido', (req, res) => {
     if (BD) {
         const ID = req.params.id;
-        const Array = req.body.Array;
-
-        let sql = `call LevantarPedido(${Cliente},${productos},${cantidades})`;
-        BD.query(sql, [ID], (err, rows) => {
+        const Array = req.body;
+        const Cliente = Array.UserId;
+        const Productos =Array.ProductList;
+        var productos= '';
+        var cantidades= ''
+        for (let i = 0; i < Productos.length; i++) {
+            productos = productos + Productos[i].Idprod + ',';
+            cantidades = cantidades + Productos[i].Cantidad + ',';
+        }
+        let sql = `call LevantarPedido(${Cliente},'${productos}','${cantidades}')`;
+        BD.query(sql, (err, rows) => {
             if (err) {
                 res.send(err)
             } else {
-                res.json(rows);
+                res.json({response: 1});
             }
         })
     }
