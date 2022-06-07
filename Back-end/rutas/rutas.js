@@ -377,13 +377,13 @@ rutas.post('/Registra-pedido', (req, res) => {
             productos = productos + Productos[i].Idprod + ',';
             cantidades = cantidades + Productos[i].Cantidad + ',';
         }
-        console.log('antes',productos , productos)
+        console.log('antes ',productos , cantidades)
         let sql = `call LevantarPedido(${Cliente},'${productos}','${cantidades}')`;
         BD.query(sql, (err) => {
             if (err) {
                 res.send(err)
             } else {
-                console.log('despues',productos , productos)
+                console.log('despues ',productos , cantidades)
                 res.json({ response: 1 });
             }
         })
